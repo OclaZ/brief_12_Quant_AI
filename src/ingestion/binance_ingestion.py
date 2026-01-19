@@ -34,8 +34,9 @@ def data_collection_api():
                     "quote_asset_volume", "taker_buy_base_volume", "taker_buy_quote_volume"]
     df[numeric_cols] = df[numeric_cols].astype(float)
     
-    df["open_time"] = pd.to_datetime(df["open_time"], unit="ms")
-    df["close_time"] = pd.to_datetime(df["close_time"], unit="ms")
+    # Conversion en datetime **millisecondes** pour compatibilité PySpark
+    df["open_time"] = pd.to_datetime(df["open_time"], unit="ms").astype('datetime64[ms]')
+    df["close_time"] = pd.to_datetime(df["close_time"], unit="ms").astype('datetime64[ms]')
     
     return df
 

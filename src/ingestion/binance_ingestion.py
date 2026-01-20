@@ -46,3 +46,4 @@ df.to_parquet("data/bronze/btc_minute_data.parquet", engine="pyarrow", index=Fal
 
 print("Fichier Parquet sauvegarde")
 
+# bronze -> raw !!!

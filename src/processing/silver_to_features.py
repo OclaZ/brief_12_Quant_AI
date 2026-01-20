@@ -12,7 +12,6 @@ from pyspark.sql import SparkSession
 '''
 # sauvgarder data f  postgres mancreyich la cible 
 spark = SparkSession.builder.appName("btc_features").getOrCreate()
-# 1) Relire btc_raw
 df_raw = spark.read.parquet("data/silver/btc_raw/")
 
 # 2) Fenêtre ordonnée par le temps

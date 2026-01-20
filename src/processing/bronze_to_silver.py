@@ -35,7 +35,7 @@ df_raw = df_bronze.select(
 
 # 3) Trier par temps + enlever doublons
 df_raw = df_raw.orderBy("open_time").dropDuplicates(["open_time"])
-
+# null to do 
 # 4) Sauvegarder la table btc_raw
 df_raw.write.mode("overwrite").parquet("data/silver/btc_raw/")
 print("Table btc_raw sauvegardée")

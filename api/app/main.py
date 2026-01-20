@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from .routes import router as auth_router
 
 from . import database
-from .. import models
+from .import models
 
 # Création automatique des tables (pour le dev uniquement)
 models.Base.metadata.create_all(bind=database.engine)

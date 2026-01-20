@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Charge les variables depuis le fichier .env
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    # Le conteneur web a aussi besoin des infos pour se connecter
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

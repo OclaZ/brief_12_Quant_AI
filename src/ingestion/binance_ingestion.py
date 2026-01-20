@@ -45,3 +45,4 @@ df = data_collection_api()
 df.to_parquet("data/bronze/btc_minute_data.parquet", engine="pyarrow", index=False)
 
 print("Fichier Parquet sauvegarde")
+

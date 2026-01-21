@@ -1,1 +1,6 @@
 plan_jira.csv
+venv/
+__pycache__/    
+*.pyc
+_SUCCESS
+._SUCCESS.crc

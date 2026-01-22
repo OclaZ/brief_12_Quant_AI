@@ -2,7 +2,21 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
-# --- Auth ---
+# ... (Garde les classes UserBase, UserCreate, UserResponse, Token inchangées) ...
+# Copie juste celles-ci si tu ne les as pas, sinon touche pas au début du fichier.
+
+class UserBase(BaseModel):
+    username: str
+
+class UserCreate(UserBase):
+    password: str
+
+class UserResponse(UserBase):
+    id: int
+    is_active: bool
+    class Config:
+        from_attributes = True
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -10,30 +24,17 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
-class UserCreate(BaseModel):
-    username: str
-    password: str
-
-class UserResponse(BaseModel):
-    id: int
-    username: str
-    class Config:
-        from_attributes = True
-
-# --- Prédiction ---
-
+# --- MODIFICATION MAJEURE ICI ---
 class MarketInput(BaseModel):
-    timestamp: datetime = datetime.now() # Valeur par défaut si non fournie
-    open: float
-    high: float
-    low: float
-    close: float
-    volume: float
+    timestamp: datetime = datetime.now()
+    # Les features exactes du modèle Linear Regression
     return_1m: float
     ma_5: float
     ma_10: float
+    volume: float
     close_prev: float
     number_of_trades: float
+    taker_ratio: float  # <--- Nouveau champ
 
 class PredictionResponse(BaseModel):
     id: int

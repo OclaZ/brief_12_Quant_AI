@@ -4,14 +4,14 @@ from pyspark.sql import SparkSession
 
 Spark = SparkSession.builder \
     .appName("save_to_postgres") \
-    .config("spark.jars", "/home/dev_team/spark_libs/postgresql-42.6.0.jar") \
+    .config("spark.jars", "/home/elbahia/spark_libs/postgresql-42.6.0.jar") \
     .config("spark.driver.memory", "4g") \
     .config("spark.executor.memory", "4g") \
     .getOrCreate()
 print("session created successfully")
 
 
-jdbc_url = "jdbc:postgresql://postgres-silver:5432/silver_db"
+jdbc_url = "jdbc:postgresql://172.21.0.2:5432/silver_db"
 connection_properties = {
     "user":"user",
     "password":"silver_db",
@@ -27,6 +27,7 @@ df_features.write.jdbc(url=jdbc_url,
                       table="btc_features",
                       mode="overwrite",
                       properties=connection_properties)
+
 print("data saved to postgres successfully")
 
 

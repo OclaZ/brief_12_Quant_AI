@@ -19,7 +19,7 @@
 services:
   postgres:
     image: postgres:15
-    container_name: postgres-silver
+    container_name: postgres-silver1
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: user

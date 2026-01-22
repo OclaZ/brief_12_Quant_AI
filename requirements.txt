@@ -1,4 +1,14 @@
 pandas 
-pyarrow
 requests
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+# Dépendances ML
 pyspark
+pyarrow
+numpy

@@ -1,29 +1,15 @@
-# services:
-
-  # postgres:
-  #   image: postgres:16
-  #   environment:
-  #     POSTGRES_USER: airflow
-  #     POSTGRES_PASSWORD: airflow
-  #     POSTGRES_DB: airflow
-  #   ports:
-  #     - "5432:5432"
-  #   healthcheck:
-  #     test: ["CMD", "pg_isready", "-U", "airflow"]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 5
-  #   volumes:
-  #     - postgres-db:/var/lib/postgresql/data
+version: '3.8'
 
 services:
+  # --- 1. Base de Données (Source de Vérité) ---
   postgres:
     image: postgres:15
-    container_name: postgres-silver
+    container_name: quant_postgres
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: user
-      POSTGRES_DB: silver_db
+      # STANDARD ÉQUIPE : On utilise "postgres" pour éviter les erreurs "Role does not exist"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: quant_db
     ports:
       - "5432:5432"
     volumes:
@@ -35,54 +21,43 @@ services:
       - "shared_buffers=512MB"
       - "-c"
       - "max_connections=200"
-      - "-c"
-      - "work_mem=32MB"
+    networks:
+      - quant_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d quant_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # --- 2. API Backend ---
+  api:
+    build: 
+      context: ./api
+    container_name: quant_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/code
+      - ./ml:/code/ml_store
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=quant_db
+      - JAVA_HOME=/usr/lib/jvm/default-java
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - quant_network
+
+# --- Volumes Persistants ---
 volumes:
   postgres_data:
     driver: local
 
-
-
-#   airflow-init:
-#     build: .
-#     container_name: airflow-init
-#     depends_on:
-#       postgres:
-#         condition: service_healthy
-#     environment:
-#       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-#       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-#     volumes:
-#       - ./init_airflow.sh:/init_airflow.sh
-#       - ./dags:/opt/airflow/dags
-#       - ./logs:/opt/airflow/logs
-#       - ./plugins:/opt/airflow/plugins
-#     entrypoint: ["/bin/bash", "/init_airflow.sh"]
-
-#   airflow:
-#     build: .
-#     container_name: airflow
-#     restart: always
-#     environment:
-#       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-#       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-#     volumes:
-#       - ./dags:/opt/airflow/dags
-#       - ./logs:/opt/airflow/logs
-#       - ./plugins:/opt/airflow/plugins
-#       - ./requirements.txt:/requirements.txt
-#       - ./data:/opt/airflow/data
-#     command: >
-#       bash -c "
-#         airflow scheduler & 
-#         airflow webserver
-#       "
-#     depends_on:
-#       postgres:
-#         condition: service_healthy
-#     ports:
-#       - "8080:8080"
-
-# volumes:
-#   postgres-db:
+# --- Réseau Partagé ---
+networks:
+  quant_network:
+    driver: bridge

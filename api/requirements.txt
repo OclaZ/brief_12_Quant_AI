@@ -2,13 +2,13 @@ fastapi
 uvicorn
 sqlalchemy
 psycopg2-binary
-#pyspark
+pyspark
 python-jose[cryptography]
 passlib[bcrypt]
 bcrypt==3.2.2
 python-multipart
 pandas
-#pyarrow
+pyarrow
 numpy
 python-dotenv
 pytest         

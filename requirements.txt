@@ -1,14 +1,16 @@
-pandas 
-requests
 fastapi
 uvicorn
 sqlalchemy
 psycopg2-binary
-pydantic
+pyspark==3.2.4
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt==3.2.2
 python-multipart
-# Dépendances ML
-pyspark
+pandas
 pyarrow
 numpy
+python-dotenv
+pytest         
+httpx  
+apache-airflow-providers-apache-spark==4.11.0

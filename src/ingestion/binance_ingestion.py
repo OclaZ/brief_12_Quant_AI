@@ -1,10 +1,10 @@
 import requests
 import pandas as pd
-
+import os
 SYMBOL = 'BTCUSDT'
 INTERVAL = '1m'   # Intervalle d'une minute
 LIMIT = 600        # Nombre de lignes à récupérer
-
+BRONZE_PATH = "data/bronze/bronze.parquet"
 def data_collection_api():
     response = requests.get(
         url='https://api.binance.com/api/v3/klines',
@@ -36,8 +36,9 @@ def data_collection_api():
     df["open_time"] = pd.to_datetime(df["open_time"], unit="ms").astype('datetime64[ms]')
     df["close_time"] = pd.to_datetime(df["close_time"], unit="ms").astype('datetime64[ms]')
     
-    return df
+    os.makedirs("data/bronze", exist_ok=True)
+    df.to_parquet(BRONZE_PATH, engine="pyarrow", index=False)
 
-df = data_collection_api()
-df.to_parquet("data/bronze/bronze.parquet", engine="pyarrow", index=False)
-print("Fichier Parquet sauvegarde")
+    return f"Bronze data saved to {BRONZE_PATH}"
+
+

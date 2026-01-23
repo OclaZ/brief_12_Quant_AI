@@ -13,7 +13,7 @@ from src.processing.save_to_postgres import save_to_postgres_task
 
 DEFAULT_ARGS = {
     "owner": "quant-ai",
-    "retries": 2,
+    "retries": 0,
     "retry_delay": timedelta(minutes=2),
 }
 
@@ -43,12 +43,7 @@ def btc_pipeline():
     def silver_to_features_task():
         return compute_silver_features()  # Aucun paramètre nécessaire
 
-    # --- Save to Postgres
-    @task
-    def save_to_postgres_task_wrapper():
-        save_to_postgres_task()
-        return "Saved to Postgres"
-
+    
     # --- Train model
     @task
     def train_model_task():
@@ -59,9 +54,9 @@ def btc_pipeline():
     bronze = bronze_task()
     silver = bronze_to_silver_task()
     features = silver_to_features_task()
-    save_task = save_to_postgres_task_wrapper()
+   
     train_task = train_model_task()
 
-    bronze >> silver >> features >> save_task >> train_task
+    bronze >> silver >> features  >> train_task
 
 dag = btc_pipeline()

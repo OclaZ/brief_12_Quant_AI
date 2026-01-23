@@ -30,18 +30,26 @@ USER root
 RUN apt-get update && \
     apt-get install -y --no-install-recommends openjdk-17-jdk && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /opt/airflow/data/silver/btc_features && \
-    chmod -R 777 /opt/airflow/data
+    rm -rf /var/lib/apt/lists/* 
+
+
+RUN mkdir -p /opt/airflow/data/bronze \
+             /opt/airflow/data/silver/btc_silver \
+             /opt/airflow/data/silver/btc_features \
+             /opt/airflow/logs && \
+    chown -R airflow:root /opt/airflow/data /opt/airflow/logs && \
+    chmod -R 775 /opt/airflow/data /opt/airflow/logs
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
-
 # Important : PYTHONPATH pour que Airflow trouve src/
 ENV PYTHONPATH=/opt/airflow
 
 USER airflow
 
-RUN pip install --no-cache-dir \
-    apache-airflow-providers-apache-spark \
-    pyspark
+COPY requirements.txt /requirements.txt
+ # Attention : ne pas utiliser --no-deps pour pyspark
+ RUN pip install --no-cache-dir -r /requirements.txt
+
+ # 4️⃣ Installer PySpark avec toutes ses dépendances (y compris py4j)
+ RUN pip install --no-cache-dir pyspark

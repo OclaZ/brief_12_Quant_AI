@@ -4,7 +4,7 @@ import os
 SYMBOL = 'BTCUSDT'
 INTERVAL = '1m'   # Intervalle d'une minute
 LIMIT = 600        # Nombre de lignes à récupérer
-BRONZE_PATH = "data/bronze/bronze.parquet"
+BRONZE_PATH = "/opt/airflow/data/bronze/btc_bronze.parquet" 
 def data_collection_api():
     response = requests.get(
         url='https://api.binance.com/api/v3/klines',
@@ -29,16 +29,19 @@ def data_collection_api():
     df = pd.DataFrame(data, columns=columns)
     
     numeric_cols = ["open", "high", "low", "close", "volume",
-                    "quote_asset_volume", "taker_buy_base_volume", "taker_buy_quote_volume"]
+                    "quote_asset_volume", "number_of_trades",
+                    "taker_buy_base_volume", "taker_buy_quote_volume"]
     df[numeric_cols] = df[numeric_cols].astype(float)
     
-    # Conversion en datetime **millisecondes** pour compatibilité PySpark
     df["open_time"] = pd.to_datetime(df["open_time"], unit="ms").astype('datetime64[ms]')
     df["close_time"] = pd.to_datetime(df["close_time"], unit="ms").astype('datetime64[ms]')
     
-    os.makedirs("data/bronze", exist_ok=True)
-    df.to_parquet(BRONZE_PATH, engine="pyarrow", index=False)
+    # --- AJOUT INDISPENSABLE ICI ---
+    bronze_dir = os.path.dirname(BRONZE_PATH)
+    os.makedirs(bronze_dir, exist_ok=True)
+    
+    # Sauvegarde effective des données pour que Spark puisse les lire
+    df.to_parquet(BRONZE_PATH, index=False)
+    # -------------------------------
 
     return f"Bronze data saved to {BRONZE_PATH}"
-
-

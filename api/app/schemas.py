@@ -1,9 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel ,ConfigDict
 from datetime import datetime
 from typing import Optional
 
-# ... (Garde les classes UserBase, UserCreate, UserResponse, Token inchangées) ...
-# Copie juste celles-ci si tu ne les as pas, sinon touche pas au début du fichier.
+
 
 class UserBase(BaseModel):
     username: str
@@ -24,7 +23,6 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
-# --- MODIFICATION MAJEURE ICI ---
 class MarketInput(BaseModel):
     timestamp: datetime = datetime.now()
     # Les features exactes du modèle Linear Regression
@@ -42,5 +40,4 @@ class PredictionResponse(BaseModel):
     predicted_price: float
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

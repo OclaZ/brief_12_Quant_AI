@@ -15,7 +15,7 @@ class MLEngine:
         self._load_model()
 
     def _initialize_spark(self):
-        print("⚡ [MLEngine] Initialisation de la session Spark...")
+        print("[MLEngine] Initialisation de la session Spark...")
         self.spark = SparkSession.builder \
             .appName("QuantAI_API") \
             .master("local[*]") \
